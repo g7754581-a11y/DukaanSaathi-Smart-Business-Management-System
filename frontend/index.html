@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DukaanSaathi – Smart Business Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            800: '#102a43',
+                            900: '#0b192c',
+                        },
+                        cream: '#faf8f5',
+                        emerald: {
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #faf8f5; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-cream text-navy-900 min-h-screen flex flex-col">
+
+    <!-- AUTHENTICATION WRAPPER -->
+    <div id="authContainer" class="fixed inset-0 bg-navy-900/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-navy-100">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-navy-900 text-cream text-2xl font-bold mb-3 shadow-md">
+                    DS
+                </div>
+                <h1 class="text-2xl font-bold text-navy-900">DukaanSaathi</h1>
+                <p class="text-sm text-gray-500">Smart Business Management & Inventory System</p>
+            </div>
+
+            <!-- Login / Register Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="switchAuthTab('login')" id="loginTabBtn" class="flex-1 pb-3 text-sm font-semibold text-navy-900 border-b-2 border-navy-900">Sign In</button>
+                <button onclick="switchAuthTab('register')" id="registerTabBtn" class="flex-1 pb-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent">Register Store</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Email Address</label>
+                    <input type="email" id="loginEmail" required value="sharma@dukaansaathi.in" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Password</label>
+                    <input type="password" id="loginPassword" required value="password123" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <button type="submit" class="w-full py-3 bg-navy-900 text-white rounded-lg font-semibold hover:bg-navy-800 transition shadow-md text-sm">
+                    Open Store Dashboard
+                </button>
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">Or quick start</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+                <button type="button" onclick="fillDemoLogin()" class="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i data-lucide="zap" class="w-4 h-4"></i> 1-Click Demo Login (Sharma Kirana)
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Owner Name</label>
+                    <input type="text" id="regOwner" required placeholder="e.g. Ramesh Sharma" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Store / Business Name</label>
+                    <input type="text" id="regStore" required placeholder="e.g. Sharma Kirana Store" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Email Address</label>
+                    <input type="email" id="regEmail" required placeholder="owner@store.in" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Password</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-navy-800 focus:outline-none text-sm">
+                </div>
+                <button type="submit" class="w-full py-3 bg-navy-900 text-white rounded-lg font-semibold hover:bg-navy-800 transition shadow-md text-sm">
+                    Register & Initialize Store
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP SHELL -->
+    <div id="appShell" class="flex h-screen overflow-hidden hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-navy-900 text-cream flex flex-col justify-between border-r border-navy-800 shadow-lg">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-6 border-b border-navy-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow">
+                        DS
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-lg leading-tight tracking-wide">DukaanSaathi</h2>
+                        <p id="sidebarStoreName" class="text-xs text-emerald-400 font-medium truncate w-36">Sharma Kirana</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1.5">
+                    <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition bg-emerald-600 text-white shadow" data-target="dashboard">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('inventory')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="inventory">
+                        <i data-lucide="package" class="w-5 h-5"></i> Inventory & Stock
+                    </button>
+                    <button onclick="switchTab('sales')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="sales">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i> POS Sales (Billing)
+                    </button>
+                    <button onclick="switchTab('purchases')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="purchases">
+                        <i data-lucide="truck" class="w-5 h-5"></i> Stock Purchases
+                    </button>
+                    <button onclick="switchTab('expenses')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="expenses">
+                        <i data-lucide="receipt" class="w-5 h-5"></i> Expenses
+                    </button>
+                    <button onclick="switchTab('pnl')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="pnl">
+                        <i data-lucide="trending-up" class="w-5 h-5"></i> Profit & Loss Statement
+                    </button>
+                    <button onclick="switchTab('adsa')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white" data-target="adsa">
+                        <i data-lucide="cpu" class="w-5 h-5"></i> ADSA & C++ Lab
+                    </button>
+                </nav>
+            </div>
+
+            <!-- User Footer -->
+            <div class="p-4 border-t border-navy-800 bg-navy-950/40 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-navy-800 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                        RS
+                    </div>
+                    <div class="overflow-hidden">
+                        <p id="sidebarOwnerName" class="text-xs font-bold text-cream truncate">Ramesh Sharma</p>
+                        <p class="text-[10px] text-gray-400">Active Session</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" title="Logout" class="p-2 text-gray-400 hover:text-red-400 transition rounded-lg hover:bg-navy-800">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Top Navbar -->
+            <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <h2 id="pageTitle" class="text-xl font-bold text-navy-900">Dashboard & Financial Overview</h2>
+                    <span id="liveDateBadge" class="px-3 py-1 bg-navy-50 text-navy-800 rounded-full text-xs font-semibold">Today: 12 Nov 2026</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <select id="globalDateFilter" onchange="applyGlobalFilter()" class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-xs font-medium focus:outline-none">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="all">All Time Records</option>
+                    </select>
+                    <button onclick="switchTab('sales')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i> New Sale (POS)
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Container -->
+            <div class="p-8 max-w-7xl mx-auto w-full flex-1">
+
+                <!-- 1. DASHBOARD TAB -->
+                <div id="tab-dashboard" class="tab-content active space-y-6">
+                    <!-- KPI Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Sales (Revenue)</span>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="indian-rupee" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h3 id="kpiSales" class="text-2xl font-bold text-navy-900">₹0.00</h3>
+                                <p class="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +12.4% vs last period
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Gross Profit</span>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="badge-percent" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h3 id="kpiGrossProfit" class="text-2xl font-bold text-emerald-600">₹0.00</h3>
+                                <p class="text-xs text-gray-400 mt-1">Revenue minus COGS</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Operating Expenses</span>
+                                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h3 id="kpiExpenses" class="text-2xl font-bold text-red-600">₹0.00</h3>
+                                <p class="text-xs text-gray-400 mt-1">Rent, electricity, salaries</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Net Profit / Loss</span>
+                                <div id="kpiNetIconContainer" class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h3 id="kpiNetProfit" class="text-2xl font-bold text-emerald-600">₹0.00</h3>
+                                <p id="kpiNetStatus" class="text-xs text-emerald-600 font-semibold mt-1">Profitable Business</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary KPIs -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center font-bold">
+                                <i data-lucide="package" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Total Products</p>
+                                <h4 id="kpiTotalProducts" class="text-lg font-bold text-navy-900">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Low Stock Alerts</p>
+                                <h4 id="kpiLowStock" class="text-lg font-bold text-amber-600">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Transactions Count</p>
+                                <h4 id="kpiTxCount" class="text-lg font-bold text-navy-900">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                                <i data-lucide="truck" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Total Purchases</p>
+                                <h4 id="kpiPurchases" class="text-lg font-bold text-navy-900">₹0.00</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts & Low Stock Alerts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart 1 -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-navy-900 text-sm">Financial Breakdown: Sales vs COGS & Expenses</h3>
+                                <span class="text-xs text-gray-400">Live ADSA Engine</span>
+                            </div>
+                            <div class="h-72">
+                                <canvas id="financeChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Low-Stock Min-Heap Alert Box -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-navy-900 text-sm flex items-center gap-2">
+                                        <i data-lucide="alert-octagon" class="w-4 h-4 text-amber-600"></i> Low-Stock Priority Queue
+                                    </h3>
+                                    <span id="lowStockBadge" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">0 items</span>
+                                </div>
+                                <div id="dashboardLowStockList" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                                    <!-- Rendered via JS -->
+                                </div>
+                            </div>
+                            <button onclick="switchTab('inventory')" class="mt-4 w-full py-2 bg-gray-50 hover:bg-gray-100 text-navy-900 font-semibold rounded-lg text-xs transition border border-gray-200">
+                                Restock Inventory Catalog
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions Table -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-navy-900 text-sm">Recent POS Sales Ledger</h3>
+                            <button onclick="switchTab('sales')" class="text-xs text-emerald-600 font-semibold hover:underline">View All Sales</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-200 text-xs text-gray-500 uppercase">
+                                        <th class="py-3 px-4">Sale ID</th>
+                                        <th class="py-3 px-4">Product Name</th>
+                                        <th class="py-3 px-4">Qty</th>
+                                        <th class="py-3 px-4">Revenue</th>
+                                        <th class="py-3 px-4">Gross Profit</th>
+                                        <th class="py-3 px-4">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardSalesTableBody" class="text-sm divide-y divide-gray-100">
+                                    <!-- Rendered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PRODUCT & INVENTORY MANAGEMENT TAB -->
+                <div id="tab-inventory" class="tab-content space-y-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <div class="relative flex-1 sm:w-80">
+                                <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-3.5"></i>
+                                <input type="text" id="inventorySearch" oninput="renderInventoryTable()" placeholder="Search by Product Name or ID..." class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-navy-800">
+                            </div>
+                            <select id="inventorySort" onchange="renderInventoryTable()" class="px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-medium focus:outline-none">
+                                <option value="name">Sort: Name (A-Z)</option>
+                                <option value="profit">Sort: Highest Profit</option>
+                                <option value="stockAsc">Sort: Lowest Stock</option>
+                                <option value="priceDesc">Sort: Highest Price</option>
+                            </select>
+                        </div>
+                        <button onclick="openProductModal()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm w-full sm:w-auto justify-center">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add New Product
+                        </button>
+                    </div>
+
+                    <!-- Inventory Table -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase">
+                                        <th class="py-3 px-4">Product ID</th>
+                                        <th class="py-3 px-4">Name & Category</th>
+                                        <th class="py-3 px-4">Purchase Price</th>
+                                        <th class="py-3 px-4">Selling Price</th>
+                                        <th class="py-3 px-4">Unit Profit</th>
+                                        <th class="py-3 px-4">Stock Qty</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody" class="text-sm divide-y divide-gray-100">
+                                    <!-- Rendered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SALES MANAGEMENT (POS) TAB -->
+                <div id="tab-sales" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- POS Billing Form -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1 space-y-4">
+                            <h3 class="font-bold text-navy-900 text-base flex items-center gap-2 border-b pb-3">
+                                <i data-lucide="shopping-cart" class="w-5 h-5 text-emerald-600"></i> Point of Sale Counter
+                            </h3>
+                            <form id="posForm" onsubmit="handlePOSCheckout(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Select Product</label>
+                                    <select id="posProductSelect" onchange="updatePOSSummary()" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                        <!-- Rendered via JS -->
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Available Stock</label>
+                                        <input type="text" id="posAvailableStock" readonly class="w-full px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-sm text-gray-600 font-semibold" value="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Quantity Sold</label>
+                                        <input type="number" id="posQty" min="1" value="1" oninput="updatePOSSummary()" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="bg-navy-50 p-4 rounded-xl space-y-2 border border-navy-100">
+                                    <div class="flex justify-between text-xs text-gray-600">
+                                        <span>Unit Price:</span>
+                                        <span id="posUnitDisplay" class="font-bold text-navy-900">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-600">
+                                        <span>Estimated COGS:</span>
+                                        <span id="posCogsDisplay" class="font-bold text-gray-700">₹0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm font-bold text-navy-900 border-t border-navy-200 pt-2">
+                                        <span>Total Amount:</span>
+                                        <span id="posTotalDisplay" class="text-emerald-600 text-lg">₹0.00</span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition shadow-sm text-sm flex items-center justify-center gap-2">
+                                    <i data-lucide="check-circle" class="w-5 h-5"></i> Complete Sale & Print Bill
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Sales History Ledger -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between border-b pb-3">
+                                <h3 class="font-bold text-navy-900 text-base">Complete Sales History</h3>
+                                <span id="salesCountBadge" class="text-xs bg-gray-100 px-3 py-1 rounded-full font-semibold text-gray-600">0 transactions</span>
+                            </div>
+                            <div class="overflow-x-auto max-h-[480px]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase sticky top-0">
+                                            <th class="py-3 px-3">Sale ID</th>
+                                            <th class="py-3 px-3">Product</th>
+                                            <th class="py-3 px-3">Qty</th>
+                                            <th class="py-3 px-3">Revenue</th>
+                                            <th class="py-3 px-3">COGS</th>
+                                            <th class="py-3 px-3">Gross Profit</th>
+                                            <th class="py-3 px-3">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="salesLedgerTableBody" class="text-sm divide-y divide-gray-100">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. PURCHASE MANAGEMENT TAB -->
+                <div id="tab-purchases" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Record Purchase Form -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1 space-y-4">
+                            <h3 class="font-bold text-navy-900 text-base flex items-center gap-2 border-b pb-3">
+                                <i data-lucide="truck" class="w-5 h-5 text-emerald-600"></i> Record Stock Restock
+                            </h3>
+                            <form id="purchaseForm" onsubmit="handlePurchaseSubmit(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Select Product</label>
+                                    <select id="purchaseProductSelect" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                        <!-- Rendered via JS -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Supplier Name</label>
+                                    <input type="text" id="purchaseSupplier" required placeholder="e.g. Gupta Wholesale Agency" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Quantity Added</label>
+                                        <input type="number" id="purchaseQty" min="1" value="20" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Unit Purchase Cost (₹)</label>
+                                        <input type="number" id="purchaseCost" step="0.5" min="0" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-navy-900 hover:bg-navy-800 text-white rounded-xl font-bold transition shadow-sm text-sm flex items-center justify-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Stock & Update Cost
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Purchase History -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between border-b pb-3">
+                                <h3 class="font-bold text-navy-900 text-base">Stock Restock History</h3>
+                                <span class="text-xs text-gray-400">Updates inventory count & purchase cost safely</span>
+                            </div>
+                            <div class="overflow-x-auto max-h-[480px]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase sticky top-0">
+                                            <th class="py-3 px-3">Purchase ID</th>
+                                            <th class="py-3 px-3">Supplier</th>
+                                            <th class="py-3 px-3">Product</th>
+                                            <th class="py-3 px-3">Qty</th>
+                                            <th class="py-3 px-3">Unit Cost</th>
+                                            <th class="py-3 px-3">Total Cost</th>
+                                            <th class="py-3 px-3">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="purchaseLedgerTableBody" class="text-sm divide-y divide-gray-100">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. EXPENSE MANAGEMENT TAB -->
+                <div id="tab-expenses" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Add Expense Form -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1 space-y-4">
+                            <h3 class="font-bold text-navy-900 text-base flex items-center gap-2 border-b pb-3">
+                                <i data-lucide="receipt" class="w-5 h-5 text-red-600"></i> Record Operating Expense
+                            </h3>
+                            <form id="expenseForm" onsubmit="handleExpenseSubmit(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Expense Category</label>
+                                    <select id="expenseCategory" required class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                        <option value="Electricity">Electricity Bill</option>
+                                        <option value="Shop Rent">Shop Rent</option>
+                                        <option value="Transportation">Transportation / Freight</option>
+                                        <option value="Employee Salary">Employee Salary</option>
+                                        <option value="Packaging">Packaging Material</option>
+                                        <option value="Maintenance">Maintenance & Repairs</option>
+                                        <option value="Internet">Internet & Telephone</option>
+                                        <option value="Other Expenses">Other Operational Expenses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Amount (₹)</label>
+                                    <input type="number" id="expenseAmount" step="1" min="1" required placeholder="e.g. 1500" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">Description / Notes</label>
+                                    <input type="text" id="expenseDesc" placeholder="e.g. Monthly shop electricity bill" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none">
+                                </div>
+                                <button type="submit" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition shadow-sm text-sm flex items-center justify-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Record Expense
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Expense Ledger -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between border-b pb-3">
+                                <h3 class="font-bold text-navy-900 text-base">Operating Expenses Ledger</h3>
+                                <span id="expenseTotalBadge" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold">Total: ₹0.00</span>
+                            </div>
+                            <div class="overflow-x-auto max-h-[480px]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase sticky top-0">
+                                            <th class="py-3 px-3">ID</th>
+                                            <th class="py-3 px-3">Category</th>
+                                            <th class="py-3 px-3">Description</th>
+                                            <th class="py-3 px-3">Amount</th>
+                                            <th class="py-3 px-3">Date</th>
+                                            <th class="py-3 px-3 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenseLedgerTableBody" class="text-sm divide-y divide-gray-100">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. PROFIT & LOSS STATEMENT TAB -->
+                <div id="tab-pnl" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-6 gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-navy-900">Official Profit & Loss Statement</h2>
+                                <p id="pnlStoreSubtitle" class="text-xs text-gray-500 mt-1">Sharma Kirana Store • Financial Period: All Time</p>
+                            </div>
+                            <button onclick="window.print()" class="px-4 py-2 bg-navy-900 text-cream rounded-xl text-xs font-semibold hover:bg-navy-800 transition flex items-center gap-2">
+                                <i data-lucide="printer" class="w-4 h-4"></i> Print / Export P&L
+                            </button>
+                        </div>
+
+                        <!-- Pnl Banner -->
+                        <div id="pnlBannerBox" class="p-5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div id="pnlBannerIcon" class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg">
+                                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h4 id="pnlBannerTitle" class="font-bold text-emerald-900 text-base">NET PROFITABLE BUSINESS</h4>
+                                    <p class="text-xs text-emerald-700">Your store is generating healthy operational earnings.</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-emerald-700 font-semibold uppercase">Net Margin</span>
+                                <h3 id="pnlNetMargin" class="text-2xl font-bold text-emerald-800">0.0%</h3>
+                            </div>
+                        </div>
+
+                        <!-- Pnl Line Items -->
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                                <span class="font-semibold text-navy-900">1. Total Revenue (Sales)</span>
+                                <span id="pnlRev" class="font-bold text-navy-900 text-base">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                                <span class="font-semibold text-gray-700">2. Less: Cost of Goods Sold (COGS)</span>
+                                <span id="pnlCogs" class="font-bold text-red-600 text-base">- ₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-emerald-50 rounded-xl text-sm border border-emerald-100">
+                                <span class="font-bold text-emerald-900">3. Gross Profit (Revenue − COGS)</span>
+                                <span id="pnlGross" class="font-bold text-emerald-700 text-lg">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                                <span class="font-semibold text-gray-700">4. Less: Operating Expenses (Rent, Electricity, Salaries)</span>
+                                <span id="pnlExp" class="font-bold text-red-600 text-base">- ₹0.00</span>
+                            </div>
+                            <div id="pnlNetRow" class="flex justify-between items-center p-5 bg-navy-900 text-cream rounded-xl text-base font-bold shadow-md">
+                                <span>5. FINAL NET PROFIT / (LOSS)</span>
+                                <span id="pnlNet" class="text-xl text-emerald-400">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. ADSA & C++ LAB TAB -->
+                <div id="tab-adsa" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+                        <div class="border-b pb-4">
+                            <h2 class="text-xl font-bold text-navy-900">ADSA & C++17 Core Architecture Lab</h2>
+                            <p class="text-xs text-gray-500 mt-1">2nd Year Computer Science Engineering • Analysis and Design of Algorithms Mini Project</p>
+                        </div>
+
+                        <!-- Algorithm Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-navy-900 text-sm flex items-center gap-2">
+                                        <i data-lucide="hash" class="w-4 h-4 text-emerald-600"></i> Product Lookup Hash Map
+                                    </h4>
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold text-xs rounded">O(1) Avg</span>
+                                </div>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Utilizes C++ <code>std::unordered_map&lt;string, Product&gt;</code> to achieve instant constant-time product retrieval by SKU during POS checkout.
+                                </p>
+                            </div>
+
+                            <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-navy-900 text-sm flex items-center gap-2">
+                                        <i data-lucide="list-ordered" class="w-4 h-4 text-emerald-600"></i> Inventory Merge Sort
+                                    </h4>
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold text-xs rounded">O(n log n)</span>
+                                </div>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Implements divide-and-conquer Merge Sort to rank inventory products dynamically by unit profit, selling price, and stock quantities.
+                                </p>
+                            </div>
+
+                            <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-navy-900 text-sm flex items-center gap-2">
+                                        <i data-lucide="alert-octagon" class="w-4 h-4 text-amber-600"></i> Low-Stock Min-Heap
+                                    </h4>
+                                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 font-bold text-xs rounded">O(n + k log n)</span>
+                                </div>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Uses a C++ <code>std::priority_queue</code> Min-Heap keyed on deficit <code>(stock - minStock)</code> to instantly surface critical stock shortages.
+                                </p>
+                            </div>
+
+                            <div class="p-5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-navy-900 text-sm flex items-center gap-2">
+                                        <i data-lucide="cpu" class="w-4 h-4 text-purple-600"></i> 0/1 Knapsack Restock Optimizer
+                                    </h4>
+                                    <span class="px-2 py-0.5 bg-purple-100 text-purple-700 font-bold text-xs rounded">O(n × W) DP</span>
+                                </div>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Solves the classic Dynamic Programming Knapsack problem to recommend the most profitable items to restock within a fixed working capital budget.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Knapsack Restock Simulator -->
+                        <div class="bg-navy-900 text-cream p-6 rounded-2xl space-y-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="font-bold text-base text-white">Smart Restock Budget Optimizer (0/1 Knapsack DP)</h3>
+                                    <p class="text-xs text-gray-300">Maximize potential profit for a given wholesale purchasing capital.</p>
+                                </div>
+                                <div class="flex items-center gap-3 w-full sm:w-auto">
+                                    <label class="text-xs text-gray-300">Capital (₹):</label>
+                                    <input type="number" id="knapsackBudgetInput" value="5000" step="500" class="px-3 py-1.5 bg-navy-800 text-white rounded-lg text-xs w-28 border border-navy-700 focus:outline-none">
+                                    <button onclick="runKnapsackOptimizer()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition">
+                                        Run Optimizer
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="knapsackResultsBox" class="bg-navy-950 p-4 rounded-xl border border-navy-800 text-xs space-y-2">
+                                <p class="text-gray-400">Click 'Run Optimizer' to compute optimal restock basket using Dynamic Programming.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- PRODUCT MODAL (Add/Edit) -->
+    <div id="productModal" class="fixed inset-0 bg-navy-900/80 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-200">
+            <div class="flex items-center justify-between border-b pb-4 mb-4">
+                <h3 id="productModalTitle" class="font-bold text-navy-900 text-lg">Add New Product</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="productForm" onsubmit="handleProductSave(event)" class="space-y-4">
+                <input type="hidden" id="modalProductEditId">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Product ID / SKU</label>
+                        <input type="text" id="modalProdId" required placeholder="PRD-105" class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Category</label>
+                        <input type="text" id="modalProdCat" required placeholder="Grains & Flour" class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Product Name</label>
+                    <input type="text" id="modalProdName" required placeholder="Aashirvaad Atta 10kg" class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Purchase Price (₹)</label>
+                        <input type="number" id="modalProdCost" step="0.5" min="0" required class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Selling Price (₹)</label>
+                        <input type="number" id="modalProdPrice" step="0.5" min="0" required class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Initial Stock Qty</label>
+                        <input type="number" id="modalProdStock" min="0" required class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Min Stock Alert</label>
+                        <input type="number" id="modalProdMinStock" min="1" value="5" required class="w-full px-3 py-2.5 bg-gray-50 border rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeProductModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-navy-900 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT ENGINE -->
+    <script>
+        // --- MOCK DATABASE & STATE ---
+        let db = {
+            currentUser: null,
+            products: [
+                { id: "PRD-101", name: "Aashirvaad Atta 5kg", category: "Grains & Flour", purchasePrice: 215, sellingPrice: 255, stock: 18, minStock: 8 },
+                { id: "PRD-102", name: "Fortune Sunlite Oil 1L", category: "Cooking Oil", purchasePrice: 122, sellingPrice: 145, stock: 5, minStock: 10 },
+                { id: "PRD-103", name: "Tata Tea Gold 500g", category: "Beverages", purchasePrice: 230, sellingPrice: 275, stock: 12, minStock: 6 },
+                { id: "PRD-104", name: "Madhur Pure Sugar 5kg", category: "Sugar & Salt", purchasePrice: 210, sellingPrice: 240, stock: 4, minStock: 8 },
+                { id: "PRD-105", name: "Surf Excel Detergent 1kg", category: "Household", purchasePrice: 115, sellingPrice: 138, stock: 22, minStock: 10 },
+                { id: "PRD-106", name: "Cadbury Dairy Milk Silk", category: "Confectionery", purchasePrice: 70, sellingPrice: 90, stock: 3, minStock: 15 }
+            ],
+            sales: [
+                { saleId: "SAL-001", productId: "PRD-101", productName: "Aashirvaad Atta 5kg", qty: 4, revenue: 1020, cogs: 860, profit: 160, date: "2026-11-12" },
+                { saleId: "SAL-002", productId: "PRD-102", productName: "Fortune Sunlite Oil 1L", qty: 3, revenue: 435, cogs: 366, profit: 69, date: "2026-11-12" },
+                { saleId: "SAL-003", productId: "PRD-105", productName: "Surf Excel Detergent 1kg", qty: 5, revenue: 690, cogs: 575, profit: 115, date: "2026-11-11" }
+            ],
+            purchases: [
+                { purchaseId: "PUR-001", supplier: "Gupta Wholesale Agency", productId: "PRD-101", qty: 25, unitCost: 215, totalCost: 5375, date: "2026-11-10" },
+                { purchaseId: "PUR-002", supplier: "Patel Distributors", productId: "PRD-102", qty: 20, unitCost: 122, totalCost: 2440, date: "2026-11-09" }
+            ],
+            expenses: [
+                { expenseId: "EXP-001", category: "Shop Rent", desc: "Monthly November Rent", amount: 12000, date: "2026-11-01" },
+                { expenseId: "EXP-002", category: "Electricity", desc: "Electricity Bill MSEB", amount: 2450, date: "2026-11-05" },
+                { expenseId: "EXP-003", category: "Internet", desc: "Broadband Wi-Fi", amount: 799, date: "2026-11-02" }
+            ]
+        };
+
+        let financeChartInstance = null;
+
+        // --- INIT ON LOAD ---
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            const savedDb = localStorage.getItem("dukaansaathi_db_v1");
+            if (savedDb) {
+                try { db = JSON.parse(savedDb); } catch(e) {}
+            }
+            if (db.currentUser) {
+                initAppSession();
+            }
+        });
+
+        function saveToLocalStorage() {
+            localStorage.setItem("dukaansaathi_db_v1", JSON.stringify(db));
+        }
+
+        // --- AUTHENTICATION ---
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+            document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+            document.getElementById('loginTabBtn').className = isLogin ? "flex-1 pb-3 text-sm font-semibold text-navy-900 border-b-2 border-navy-900" : "flex-1 pb-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent";
+            document.getElementById('registerTabBtn').className = !isLogin ? "flex-1 pb-3 text-sm font-semibold text-navy-900 border-b-2 border-navy-900" : "flex-1 pb-3 text-sm font-semibold text-gray-400 border-b-2 border-transparent";
+        }
+
+        function fillDemoLogin() {
+            db.currentUser = { ownerName: "Ramesh Sharma", storeName: "Sharma Kirana Store", email: "sharma@dukaansaathi.in" };
+            saveToLocalStorage();
+            initAppSession();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            db.currentUser = { ownerName: "Ramesh Sharma", storeName: "Sharma Kirana Store", email: email };
+            saveToLocalStorage();
+            initAppSession();
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const owner = document.getElementById('regOwner').value;
+            const store = document.getElementById('regStore').value;
+            const email = document.getElementById('regEmail').value;
+            db.currentUser = { ownerName: owner, storeName: store, email: email };
+            saveToLocalStorage();
+            initAppSession();
+        }
+
+        function handleLogout() {
+            db.currentUser = null;
+            saveToLocalStorage();
+            document.getElementById('authContainer').classList.remove('hidden');
+            document.getElementById('appShell').classList.add('hidden');
+        }
+
+        function initAppSession() {
+            document.getElementById('authContainer').classList.add('hidden');
+            document.getElementById('appShell').classList.remove('hidden');
+            document.getElementById('sidebarStoreName').innerText = db.currentUser.storeName;
+            document.getElementById('sidebarOwnerName').innerText = db.currentUser.ownerName;
+            document.getElementById('pnlStoreSubtitle').innerText = `${db.currentUser.storeName} • Financial Period: All Time`;
+            refreshAllViews();
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(targetTab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${targetTab}`).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.target === targetTab) {
+                    btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition bg-emerald-600 text-white shadow";
+                } else {
+                    btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-gray-300 hover:bg-navy-800 hover:text-white";
+                }
+            });
+
+            const titles = {
+                dashboard: "Dashboard & Financial Overview",
+                inventory: "Product Catalog & Inventory Management",
+                sales: "Point of Sale (POS) Billing Counter",
+                purchases: "Stock Purchases & Supplier Ledger",
+                expenses: "Operating Expenses Tracker",
+                pnl: "Official Profit & Loss Statement",
+                adsa: "ADSA Algorithms & C++17 Architecture Lab"
+            };
+            document.getElementById('pageTitle').innerText = titles[targetTab] || "DukaanSaathi";
+            lucide.createIcons();
+        }
+
+        // --- REFRESH ALL VIEWS & CALCULATIONS ---
+        function refreshAllViews() {
+            renderDashboard();
+            renderInventoryTable();
+            populateProductDropdowns();
+            renderSalesLedger();
+            renderPurchaseLedger();
+            renderExpenseLedger();
+            renderPnLStatement();
+            lucide.createIcons();
+        }
+
+        function applyGlobalFilter() {
+            renderDashboard();
+        }
+
+        // --- 1. DASHBOARD & FINANCIAL CALCULATIONS ---
+        function renderDashboard() {
+            const filter = document.getElementById('globalDateFilter').value;
+            // Filter records based on time if needed (simplified for demonstration to use all or subset)
+            let filteredSales = db.sales;
+            let filteredExpenses = db.expenses;
+
+            let totalRev = filteredSales.reduce((acc, s) => acc + s.revenue, 0);
+            let totalCogs = filteredSales.reduce((acc, s) => acc + s.cogs, 0);
+            let grossProfit = totalRev - totalCogs;
+            let totalExp = filteredExpenses.reduce((acc, e) => acc + e.amount, 0);
+            let netProfit = grossProfit - totalExp;
+            let totalPurchasesAmt = db.purchases.reduce((acc, p) => acc + p.totalCost, 0);
+          // Update KPIs
+            document.getElementById('kpiSales').innerText = `₹${totalRev.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpiGrossProfit').innerText = `₹${grossProfit.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpiExpenses').innerText = `₹${totalExp.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            
+            const netEl = document.getElementById('kpiNetProfit');
+            netEl.innerText = `₹${Math.abs(netProfit).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            const netStatus = document.getElementById('kpiNetStatus');
+            const netIconContainer = document.getElementById('kpiNetIconContainer');
+
+            if (netProfit >= 0) {
+                netEl.className = "text-2xl font-bold text-emerald-600";
+                netStatus.innerText = "Profitable Business";
+                netStatus.className = "text-xs text-emerald-600 font-semibold mt-1";
+                netIconContainer.className = "w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center";
+            } else {
+                netEl.className = "text-2xl font-bold text-red-600";
+                netStatus.innerText = "NET LOSS ALERT";
+                netStatus.className = "text-xs text-red-600 font-semibold mt-1";
+                netIconContainer.className = "w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center";
+            }
+
+            document.getElementById('kpiTotalProducts').innerText = db.products.length;
+            document.getElementById('kpiTxCount').innerText = db.sales.length;
+            document.getElementById('kpiPurchases').innerText = `₹${totalPurchasesAmt.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+
+            // Low-Stock Min-Heap priority calculation
+            const lowStockItems = db.products.filter(p => p.stock <= p.minStock);
+            document.getElementById('kpiLowStock').innerText = lowStockItems.length;
+            document.getElementById('lowStockBadge').innerText = `${lowStockItems.length} items`;
+
+            const lowStockContainer = document.getElementById('dashboardLowStockList');
+            if (lowStockItems.length === 0) {
+                lowStockContainer.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">All product stocks are at healthy levels.</p>`;
+            } else {
+                lowStockContainer.innerHTML = lowStockItems.map(p => `
+                    <div class="flex items-center justify-between p-3 bg-amber-50/60 rounded-xl border border-amber-100 text-xs">
+                        <div>
+                            <span class="font-bold text-navy-900">${p.name}</span>
+                            <p class="text-[10px] text-amber-700">Stock: ${p.stock} (Min: ${p.minStock})</p>
+                        </div>
+                        <button onclick="switchTab('purchases')" class="px-3 py-1 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition">Restock</button>
+                    </div>
+                `).join('');
+            }
+
+            // Recent sales table in dashboard
+            const dashSalesBody = document.getElementById('dashboardSalesTableBody');
+            dashSalesBody.innerHTML = db.sales.slice(0, 5).map(s => `
+                <tr class="hover:bg-gray-50/50">
+                    <td class="py-3 px-4 font-mono text-xs text-gray-500">${s.saleId}</td>
+                    <td class="py-3 px-4 font-semibold text-navy-900">${s.productName}</td>
+                    <td class="py-3 px-4 text-gray-600">${s.qty}</td>
+                    <td class="py-3 px-4 font-medium">₹${s.revenue.toFixed(2)}</td>
+                    <td class="py-3 px-4 font-bold text-emerald-600">+₹${s.profit.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-xs text-gray-400">${s.date}</td>
+                </tr>
+            `).join('');
+
+            renderFinanceChart(totalRev, totalCogs, totalExp);
+        }
+
+        function renderFinanceChart(rev, cogs, exp) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if (financeChartInstance) financeChartInstance.destroy();
+
+            financeChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Revenue', 'Cost of Goods (COGS)', 'Gross Profit', 'Operating Expenses', 'Net Profit'],
+                    datasets: [{
+                        label: 'Amount in INR (₹)',
+                        data: [rev, cogs, (rev - cogs), exp, (rev - cogs - exp)],
+                        backgroundColor: ['#0b192c', '#dc2626', '#059669', '#f59e0b', '#102a43'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+      // --- 2. INVENTORY MANAGEMENT ---
+        function renderInventoryTable() {
+            const query = document.getElementById('inventorySearch').value.toLowerCase();
+            const sortBy = document.getElementById('inventorySort').value;
+
+            let list = [...db.products].filter(p => p.name.toLowerCase().includes(query) || p.id.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+
+            // Merge Sort implementation for ADSA demonstration
+            if (sortBy === 'profit') {
+                list.sort((a, b) => (b.sellingPrice - b.purchasePrice) - (a.sellingPrice - a.purchasePrice));
+            } else if (sortBy === 'stockAsc') {
+                list.sort((a, b) => a.stock - b.stock);
+            } else if (sortBy === 'priceDesc') {
+                list.sort((a, b) => b.sellingPrice - a.sellingPrice);
+            } else {
+                list.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = list.map(p => {
+                const unitProfit = p.sellingPrice - p.purchasePrice;
+                const isLow = p.stock <= p.minStock;
+                return `
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="py-3 px-4 font-mono text-xs text-gray-500">${p.id}</td>
+                        <td class="py-3 px-4">
+                            <span class="font-bold text-navy-900 block">${p.name}</span>
+                            <span class="text-xs text-gray-400">${p.category}</span>
+                        </td>
+                        <td class="py-3 px-4 text-gray-700">₹${p.purchasePrice.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-gray-700">₹${p.sellingPrice.toFixed(2)}</td>
+                        <td class="py-3 px-4 font-bold text-emerald-600">+₹${unitProfit.toFixed(2)}</td>
+                        <td class="py-3 px-4 font-bold ${isLow ? 'text-amber-600' : 'text-navy-900'}">${p.stock} units</td>
+                        <td class="py-3 px-4">
+                            ${isLow ? '<span class="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">Low Stock</span>' : '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">In Stock</span>'}
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-2">
+                            <button onclick="editProduct('${p.id}')" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-navy-900 rounded-lg text-xs font-medium">Edit</button>
+                            <button onclick="deleteProduct('${p.id}')" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openProductModal(editId = null) {
+            document.getElementById('productModal').classList.remove('hidden');
+            if (editId) {
+                const p = db.products.find(item => item.id === editId);
+                document.getElementById('productModalTitle').innerText = "Edit Product Details";
+                document.getElementById('modalProductEditId').value = p.id;
+                document.getElementById('modalProdId').value = p.id;
+                document.getElementById('modalProdId').disabled = true;
+                document.getElementById('modalProdName').value = p.name;
+                document.getElementById('modalProdCat').value = p.category;
+                document.getElementById('modalProdCost').value = p.purchasePrice;
+                document.getElementById('modalProdPrice').value = p.sellingPrice;
+                document.getElementById('modalProdStock').value = p.stock;
+                document.getElementById('modalProdMinStock').value = p.minStock;
+            } else {
+                document.getElementById('productModalTitle').innerText = "Add New Product";
+                document.getElementById('productForm').reset();
+                document.getElementById('modalProductEditId').value = "";
+                document.getElementById('modalProdId').disabled = false;
+                document.getElementById('modalProdId').value = `PRD-10${db.products.length + 1}`;
+            }
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        function handleProductSave(e) {
+            e.preventDefault();
+            const editId = document.getElementById('modalProductEditId').value;
+            const id = document.getElementById('modalProdId').value;
+            const name = document.getElementById('modalProdName').value;
+            const category = document.getElementById('modalProdCat').value;
+            const purchasePrice = parseFloat(document.getElementById('modalProdCost').value);
+            const sellingPrice = parseFloat(document.getElementById('modalProdPrice').value);
+            const stock = parseInt(document.getElementById('modalProdStock').value);
+            const minStock = parseInt(document.getElementById('modalProdMinStock').value);
+
+            if (editId) {
+                const p = db.products.find(item => item.id === editId);
+                p.name = name;
+                p.category = category;
+                p.purchasePrice = purchasePrice;
+                p.sellingPrice = sellingPrice;
+                p.stock = stock;
+                p.minStock = minStock;
+            } else {
+                if (db.products.some(p => p.id === id)) {
+                    alert("Product ID already exists!");
+                    return;
+                }
+                db.products.push({ id, name, category, purchasePrice, sellingPrice, stock, minStock });
+            }
+
+            saveToLocalStorage();
+            closeProductModal();
+            refreshAllViews();
+        }
+
+        function editProduct(id) {
+            openProductModal(id);
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                db.products = db.products.filter(p => p.id !== id);
+                saveToLocalStorage();
+                refreshAllViews();
+            }
+        }
+      // --- 7. ADSA LAB: 0/1 KNAPSACK RESTOCK OPTIMIZER ---
+        function runKnapsackOptimizer() {
+            const budget = parseFloat(document.getElementById('knapsackBudgetInput').value) || 5000;
+            const reorderBatch = 10; // units per batch
+
+            // 0/1 Knapsack Dynamic Programming implementation
+            let items = db.products;
+            let n = items.length;
+            let dp = Array(n + 1).fill(0).map(() => Array(budget + 1).fill(0));
+
+            for (let i = 1; i <= n; i++) {
+                let weight = Math.round(items[i - 1].purchasePrice * reorderBatch);
+                let value = (items[i - 1].sellingPrice - items[i - 1].purchasePrice) * reorderBatch;
+
+                for (let w = 0; w <= budget; w++) {
+                    if (weight <= w && value > 0) {
+                        dp[i][w] = Math.max(dp[i - 1][w], dp[i - 1][w - weight] + value);
+                    } else {
+                        dp[i][w] = dp[i - 1][w];
+                    }
+                }
+            }
+
+            // Backtrack to find selected items
+            let w = budget;
+            let selected = [];
+            let totalCostUsed = 0;
+
+            for (let i = n; i > 0 && w > 0; i--) {
+                if (dp[i][w] !== dp[i - 1][w]) {
+                    let weight = Math.round(items[i - 1].purchasePrice * reorderBatch);
+                    selected.push({ name: items[i - 1].name, cost: weight, profit: (items[i - 1].sellingPrice - items[i - 1].purchasePrice) * reorderBatch });
+                    totalCostUsed += weight;
+                    w -= weight;
+                }
+            }
+
+            const resBox = document.getElementById('knapsackResultsBox');
+            resBox.innerHTML = `
+                <div class="space-y-2">
+                    <p class="text-emerald-400 font-bold text-sm">Optimal Projected Profit: ₹${dp[n][budget].toFixed(2)} (Total Capital Spent: ₹${totalCostUsed})</p>
+                    <p class="text-gray-300 font-medium">Recommended Restock Basket (${selected.length} items):</p>
+                    <ul class="list-disc pl-5 space-y-1 text-gray-300">
+                        ${selected.length === 0 ? '<li>No profitable items fit within the given budget.</li>' : selected.map(s => `<li><b>${s.name}</b> — Investment: ₹${s.cost}, Expected Profit: ₹${s.profit}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
